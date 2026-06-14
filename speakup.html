@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeakUp! 英会話練習</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  min-height: 100vh; color: #f0f9ff;
+}
+.wrap { max-width: 440px; margin: 0 auto; padding: 24px 16px 80px; }
+.hidden { display: none !important; }
+button { cursor: pointer; font-family: inherit; }
+
+.header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+.logo-text { font-size: 22px; font-weight: 900; letter-spacing: -1px; }
+.logo-sub { font-size: 12px; color: #94a3b8; }
+
+.hero { text-align: center; padding: 8px 0 28px; }
+.hero-emoji { font-size: 60px; }
+.hero-title { font-size: 26px; font-weight: 900; line-height: 1.35; margin: 12px 0 8px; }
+.hero-sub { font-size: 14px; color: #94a3b8; }
+
+.btn-primary { width: 100%; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 700; color: white; background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.btn-purple { width: 100%; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 700; color: white; background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.btn-ghost { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 10px 16px; font-size: 14px; color: #e2e8f0; }
+.btn-green { border: none; border-radius: 10px; padding: 10px 18px; font-size: 14px; font-weight: 600; color: white; background: linear-gradient(135deg, #10b981, #059669); }
+.btn-back { background: none; border: none; color: #94a3b8; font-size: 14px; padding: 0; margin-bottom: 16px; display: block; }
+
+.chat-banner { width: 100%; display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 16px; padding: 18px 20px; color: white; margin-bottom: 28px; text-align: left; }
+.chat-banner-title { font-size: 15px; font-weight: 700; }
+.chat-banner-sub { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+
+.section-title { font-size: 14px; font-weight: 700; color: #cbd5e1; margin-bottom: 12px; }
+.lesson-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
+.lesson-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 20px 12px; text-align: center; color: white; }
+.lesson-emoji { font-size: 40px; margin-bottom: 10px; }
+.lesson-title { font-size: 14px; font-weight: 700; }
+.lesson-count { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+.progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.progress-bar { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg,#6366f1,#8b5cf6); border-radius: 4px; transition: width 0.4s; }
+.progress-text { font-size: 13px; color: #94a3b8; white-space: nowrap; }
+
+.phrase-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 24px 20px; text-align: center; margin-bottom: 14px; }
+.phrase-label { font-size: 12px; color: #94a3b8; margin-bottom: 14px; }
+.phrase-en { font-size: 22px; font-weight: 900; line-height: 1.4; margin-bottom: 10px; }
+.phrase-ja { font-size: 14px; color: #94a3b8; margin-bottom: 18px; }
+.btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* MIC BUTTON */
+.mic-wrap { text-align: center; margin: 20px 0; }
+.btn-mic {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 8px;
+  border: none; border-radius: 80px; padding: 22px 44px;
+  font-size: 16px; font-weight: 700; color: white;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 8px 24px rgba(239,68,68,0.4);
+  min-width: 200px;
+}
+.btn-mic.active { background: linear-gradient(135deg, #b91c1c, #991b1b); border: 4px solid rgba(239,68,68,0.6); }
+.btn-mic .mic-icon { font-size: 38px; line-height: 1; }
+
+.mic-status { text-align:center; font-size:13px; color:#94a3b8; margin-top:8px; min-height:20px; }
+
+.transcript-box { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; }
+.transcript-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+.transcript-text { font-size: 15px; font-style: italic; }
+
+.feedback-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 20px 16px; }
+.score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.score-badge { font-size: 28px; font-weight: 900; border-radius: 12px; padding: 8px 16px; min-width: 72px; text-align: center; }
+.score-good { background:#d1fae5; color:#065f46; }
+.score-ok   { background:#fef3c7; color:#92400e; }
+.score-bad  { background:#fee2e2; color:#991b1b; }
+.feedback-msg { font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 12px; }
+.correction-box { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; }
+.correction-label { font-size: 11px; color: #d97706; margin-bottom: 4px; }
+.correction-text { font-size: 15px; color: #fef3c7; font-weight: 600; margin-bottom: 6px; }
+.tip-box { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #a5b4fc; margin-bottom: 14px; }
+.action-row { display: flex; gap: 10px; }
+.btn-retry { flex:1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 13px; font-size: 14px; color: #e2e8f0; font-weight: 600; }
+.btn-next  { flex:2; border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 700; color: white; background: linear-gradient(135deg,#3b82f6,#2563eb); }
+
+.result-wrap { text-align: center; padding-top: 20px; }
+.result-avg { font-size: 72px; font-weight: 900; line-height: 1; }
+.score-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.07); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; font-size: 13px; color: #e2e8f0; }
+
+.chat-header { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.07); border-radius: 16px; padding: 12px 16px; margin-bottom: 10px; }
+.ai-avatar { width: 44px; height: 44px; background: linear-gradient(135deg,#6366f1,#8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.chat-guide { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #a5b4fc; margin-bottom: 14px; }
+.suggest-btn { display: block; width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #e2e8f0; text-align: left; margin-bottom: 8px; }
+.messages { display: flex; flex-direction: column; gap: 10px; padding-bottom: 100px; }
+.bubble { max-width: 82%; border-radius: 18px; padding: 12px 16px; font-size: 14px; line-height: 1.5; }
+.bubble.user { align-self: flex-end; background: linear-gradient(135deg,#3b82f6,#2563eb); border-bottom-right-radius: 4px; }
+.bubble.ai   { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+.bubble-listen { background: none; border: none; color: #818cf8; font-size: 13px; cursor: pointer; margin-top: 6px; padding: 0; display: block; }
+
+.input-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 440px; background: rgba(15,23,42,0.97); border-top: 1px solid rgba(255,255,255,0.1); padding: 12px 16px; display: flex; gap: 8px; }
+.chat-input { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 11px 14px; font-size: 14px; color: white; outline: none; font-family: inherit; }
+.chat-input::placeholder { color: #64748b; }
+.btn-send { background: linear-gradient(135deg,#3b82f6,#2563eb); border: none; border-radius: 12px; padding: 11px 16px; font-size: 14px; font-weight: 700; color: white; }
+.btn-mic-sm { border: none; border-radius: 12px; padding: 11px 14px; font-size: 18px; color: white; background: linear-gradient(135deg,#10b981,#059669); }
+.btn-mic-sm.active { background: linear-gradient(135deg,#ef4444,#dc2626); }
+
+.hint-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 14px; font-size: 13px; color: #a5b4fc; margin-bottom: 12px; line-height: 1.8; }
+.loading-box { text-align: center; padding: 16px 0; color: #94a3b8; font-size: 14px; }
+
+/* Permission overlay */
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:999; padding:20px; }
+.overlay-box { background:#1e293b; border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:28px 24px; text-align:center; max-width:340px; }
+.overlay-box h2 { font-size:18px; margin-bottom:12px; }
+.overlay-box p  { font-size:14px; color:#94a3b8; line-height:1.6; margin-bottom:20px; }
+</style>
+</head>
+<body>
+
+<!-- ══ HOME ══ -->
+<div id="page-home" class="wrap">
+  <div class="header">
+    <span style="font-size:36px">🎙️</span>
+    <div>
+      <div class="logo-text">SpeakUp!</div>
+      <div class="logo-sub">英会話スピーキング練習</div>
+    </div>
+  </div>
+  <div class="hero">
+    <div class="hero-emoji">🗣️</div>
+    <div class="hero-title">話せる英語を<br>身につけよう</div>
+    <div class="hero-sub">AIとの会話練習で自信をつけよう</div>
+  </div>
+  <button class="chat-banner" onclick="openChat()">
+    <span style="font-size:28px">💬</span>
+    <div>
+      <div class="chat-banner-title">AIと自由会話</div>
+      <div class="chat-banner-sub">何でも話してみよう！</div>
+    </div>
+    <span style="margin-left:auto;font-size:18px">→</span>
+  </button>
+  <div class="section-title">📚 レッスンを選ぼう</div>
+  <div class="lesson-grid" id="lesson-grid"></div>
+</div>
+
+<!-- ══ LESSON INTRO ══ -->
+<div id="page-lesson" class="wrap hidden">
+  <button class="btn-back" onclick="showPage('home')">← ホームへ戻る</button>
+  <div style="text-align:center;margin-bottom:24px">
+    <div id="l-emoji" style="font-size:60px"></div>
+    <div id="l-title" style="font-size:24px;font-weight:900;margin:10px 0 4px"></div>
+    <div id="l-count" style="font-size:13px;color:#94a3b8"></div>
+  </div>
+  <div id="l-phrases"></div>
+  <button class="btn-primary" onclick="startPractice()" style="margin-top:8px">🎙️ 練習スタート！</button>
+</div>
+
+<!-- ══ PRACTICE ══ -->
+<div id="page-practice" class="wrap hidden">
+  <button class="btn-back" onclick="showPage('lesson')">← レッスンへ</button>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="p-fill" style="width:0%"></div></div>
+    <span class="progress-text" id="p-text">1/4</span>
+  </div>
+  <div class="phrase-card">
+    <div class="phrase-label">この英語を話してみよう</div>
+    <div class="phrase-en" id="p-en"></div>
+    <div class="phrase-ja" id="p-ja"></div>
+    <div class="btn-row">
+      <button class="btn-green" id="btn-listen" onclick="speakPhrase()">🔊 お手本を聞く</button>
+      <button class="btn-ghost" id="btn-slow" onclick="speakPhraseSlow()">🐢 ゆっくり</button>
+    </div>
+  </div>
+  <button class="btn-ghost" onclick="toggleHint()" id="hint-btn" style="margin-bottom:10px">💡 発音ヒントを見る</button>
+  <div id="hint-box" class="hint-box hidden"></div>
+
+  <div class="mic-wrap">
+    <button class="btn-mic" id="mic-btn" onclick="handleMicClick()">
+      <span class="mic-icon" id="mic-icon">🎙️</span>
+      <span id="mic-label">タップして話す</span>
+    </button>
+    <div class="mic-status" id="mic-status"></div>
+  </div>
+
+  <div id="transcript-box" class="transcript-box hidden">
+    <div class="transcript-label">あなたが言った言葉：</div>
+    <div class="transcript-text" id="transcript-text"></div>
+  </div>
+  <div id="loading-box" class="loading-box hidden">⏳ AIが評価中…</div>
+
+  <div id="feedback-card" class="feedback-card hidden">
+    <div class="score-row">
+      <div class="score-badge" id="score-badge"></div>
+      <div id="score-label" style="font-size:15px;font-weight:700"></div>
+    </div>
+    <div class="feedback-msg" id="feedback-msg"></div>
+    <div id="correction-box" class="correction-box hidden">
+      <div class="correction-label">正しい言い方：</div>
+      <div class="correction-text" id="correction-text"></div>
+      <button class="btn-ghost" style="font-size:12px;padding:4px 10px;margin-top:4px" onclick="speakCorrection()">🔊 聞く</button>
+    </div>
+    <div id="tip-box" class="tip-box hidden"></div>
+    <div class="action-row">
+      <button class="btn-retry" onclick="retryPhrase()">🔄 もう一度</button>
+      <button class="btn-next" id="btn-next" onclick="nextPhrase()">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESULT ══ -->
+<div id="page-result" class="wrap hidden">
+  <div class="result-wrap">
+    <div id="r-emoji" style="font-size:72px;margin-bottom:16px"></div>
+    <div style="font-size:26px;font-weight:900;margin-bottom:16px">レッスン完了！</div>
+    <div class="result-avg" id="r-avg"></div>
+    <div style="font-size:14px;color:#94a3b8;margin-bottom:20px">平均スコア</div>
+    <div id="r-scores" style="text-align:left;margin-bottom:24px"></div>
+    <button class="btn-primary" onclick="showPage('home')" style="margin-bottom:10px">🏠 ホームへ戻る</button>
+    <button class="btn-purple" onclick="openChat()">💬 AIと自由会話してみよう</button>
+  </div>
+</div>
+
+<!-- ══ CHAT ══ -->
+<div id="page-chat" class="wrap hidden">
+  <button class="btn-back" onclick="showPage('home')">← ホームへ</button>
+  <div class="chat-header">
+    <div class="ai-avatar">🤖</div>
+    <div>
+      <div style="font-size:15px;font-weight:700">AI英語パートナー</div>
+      <div style="font-size:12px;color:#34d399">● オンライン中</div>
+    </div>
+  </div>
+  <div class="chat-guide">💡 英語でも日本語でも入力OK！マイクでも話せます</div>
+  <div id="suggestions">
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:10px">まずはこれを言ってみよう：</div>
+    <button class="suggest-btn" onclick="sendChat('Hello! Nice to meet you!')">Hello! Nice to meet you!</button>
+    <button class="suggest-btn" onclick="sendChat('What is your name?')">What is your name?</button>
+    <button class="suggest-btn" onclick="sendChat('I want to practice English.')">I want to practice English.</button>
+  </div>
+  <div class="messages" id="messages"></div>
+  <div class="input-bar">
+    <input class="chat-input" id="chat-input" placeholder="英語を入力..." onkeydown="if(event.key==='Enter')sendChatInput()">
+    <button class="btn-send" onclick="sendChatInput()">送信</button>
+    <button class="btn-mic-sm" id="chat-mic-btn" onclick="toggleChatMic()">🎙️</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════
+// DATA
+// ══════════════════════════════
+const LESSONS = [
+  { id:1, title:"自己紹介", emoji:"👋", phrases:[
+    {en:"Hello! My name is Ken.", ja:"こんにちは！私の名前はケンです。"},
+    {en:"Nice to meet you!", ja:"はじめまして！"},
+    {en:"I am from Japan.", ja:"私は日本出身です。"},
+    {en:"I am learning English.", ja:"英語を勉強しています。"},
+  ]},
+  { id:2, title:"カフェで", emoji:"☕", phrases:[
+    {en:"Can I have a coffee please?", ja:"コーヒーをください。"},
+    {en:"How much is it?", ja:"おいくらですか？"},
+    {en:"Thank you very much!", ja:"ありがとうございます！"},
+    {en:"Could I have the menu?", ja:"メニューをいただけますか？"},
+  ]},
+  { id:3, title:"道を尋ねる", emoji:"🗺️", phrases:[
+    {en:"Excuse me, where is the station?", ja:"すみません、駅はどこですか？"},
+    {en:"How far is it?", ja:"どのくらい遠いですか？"},
+    {en:"Please turn left at the corner.", ja:"角を左に曲がってください。"},
+    {en:"Is it far from here?", ja:"ここから遠いですか？"},
+  ]},
+  { id:4, title:"ショッピング", emoji:"🛍️", phrases:[
+    {en:"Do you have a different size?", ja:"別のサイズはありますか？"},
+    {en:"I am just looking, thanks.", ja:"見ているだけです。"},
+    {en:"Can I try this on?", ja:"試着できますか？"},
+    {en:"I will take this one.", ja:"これをください。"},
+  ]},
+];
+
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+let currentLesson = null;
+let phraseIdx = 0;
+let scores = [];
+let isRecording = false;
+let recognition = null;
+let correctionText = "";
+let showHint = false;
+let chatLoading = false;
+let isChatRec = false;
+let micStream = null; // keeps getUserMedia stream alive
+
+// ══════════════════════════════
+// PAGE NAV
+// ══════════════════════════════
+function showPage(name) {
+  ['home','lesson','practice','result','chat'].forEach(p => {
+    document.getElementById('page-'+p).classList.toggle('hidden', p !== name);
+  });
+}
+
+// ══════════════════════════════
+// INIT HOME
+// ══════════════════════════════
+(function initHome() {
+  const grid = document.getElementById('lesson-grid');
+  LESSONS.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'lesson-card';
+    btn.innerHTML = `<div class="lesson-emoji">${l.emoji}</div><div class="lesson-title">${l.title}</div><div class="lesson-count">${l.phrases.length}フレーズ</div>`;
+    btn.onclick = () => openLesson(l.id);
+    grid.appendChild(btn);
+  });
+})();
+
+// ══════════════════════════════
+// TTS
+// ══════════════════════════════
+function speak(text, rate) {
+  if (!text) return;
+  rate = rate || 0.85;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = rate;
+  u.pitch = 1.0;
+  // Android needs a slight delay for voices to load
+  function doSpeak() {
+    const voices = window.speechSynthesis.getVoices();
+    const v = voices.find(x => x.lang === 'en-US') || voices.find(x => x.lang.startsWith('en')) || null;
+    if (v) u.voice = v;
+    window.speechSynthesis.speak(u);
+  }
+  if (window.speechSynthesis.getVoices().length === 0) {
+    window.speechSynthesis.onvoiceschanged = doSpeak;
+  } else {
+    doSpeak();
+  }
+}
+
+function speakPhrase()     { const l=LESSONS.find(x=>x.id===currentLesson); if(l) speak(l.phrases[phraseIdx].en, 0.85); }
+function speakPhraseSlow() { const l=LESSONS.find(x=>x.id===currentLesson); if(l) speak(l.phrases[phraseIdx].en, 0.55); }
+function speakCorrection() { speak(correctionText, 0.85); }
+
+// ══════════════════════════════
+// MIC PERMISSION + STT
+// ══════════════════════════════
+function setMicUI(state) {
+  // state: 'idle' | 'requesting' | 'recording' | 'processing'
+  const btn = document.getElementById('mic-btn');
+  const icon = document.getElementById('mic-icon');
+  const label = document.getElementById('mic-label');
+  const status = document.getElementById('mic-status');
+  if (!btn) return;
+  btn.classList.remove('active');
+  switch(state) {
+    case 'idle':
+      icon.textContent = '🎙️'; label.textContent = 'タップして話す'; status.textContent = ''; break;
+    case 'requesting':
+      icon.textContent = '⏳'; label.textContent = 'マイク許可中…'; status.textContent = 'ダイアログが出たら「許可」を押してください'; break;
+    case 'recording':
+      btn.classList.add('active');
+      icon.textContent = '⏹️'; label.textContent = '録音中… 停止する'; status.textContent = '話し終わったらもう一度タップ'; break;
+    case 'processing':
+      icon.textContent = '⏳'; label.textContent = '処理中…'; status.textContent = ''; break;
+  }
+}
+
+async function handleMicClick() {
+  if (isRecording) {
+    // stop
+    if (recognition) recognition.stop();
+    isRecording = false;
+    setMicUI('idle');
+    return;
+  }
+
+  // Step 1: getUserMedia to trigger permission dialog on Android
+  setMicUI('requesting');
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch(e) {
+    setMicUI('idle');
+    alert('マイクへのアクセスが拒否されました。\nブラウザの設定でマイクを「許可」にしてください。');
+    return;
+  }
+
+  // Step 2: Start SpeechRecognition
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    setMicUI('idle');
+    alert('音声認識はChromeブラウザのみ対応しています。');
+    return;
+  }
+
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    setMicUI('recording');
+  };
+
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    isRecording = false;
+    setMicUI('processing');
+    // stop stream
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+    // show transcript
+    document.getElementById('transcript-text').textContent = '"' + text + '"';
+    document.getElementById('transcript-box').classList.remove('hidden');
+    evaluate(text);
+  };
+
+  recognition.onerror = (e) => {
+    isRecording = false;
+    setMicUI('idle');
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+    if (e.error === 'no-speech') {
+      document.getElementById('mic-status').textContent = '音声が聞き取れませんでした。もう一度試してください。';
+    } else if (e.error === 'not-allowed') {
+      alert('マイクが許可されていません。ブラウザの設定を確認してください。');
+    }
+  };
+
+  recognition.onend = () => {
+    if (isRecording) { isRecording = false; setMicUI('idle'); }
+  };
+
+  recognition.start();
+}
+
+// ══════════════════════════════
+// LESSON FLOW
+// ══════════════════════════════
+function openLesson(id) {
+  currentLesson = id;
+  phraseIdx = 0; scores = [];
+  const l = LESSONS.find(x => x.id === id);
+  document.getElementById('l-emoji').textContent = l.emoji;
+  document.getElementById('l-title').textContent = l.title;
+  document.getElementById('l-count').textContent = '全' + l.phrases.length + 'フレーズ';
+  const box = document.getElementById('l-phrases');
+  box.innerHTML = '';
+  l.phrases.forEach(p => {
+    box.innerHTML += `<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;margin-bottom:10px">
+      <div style="font-size:16px;font-weight:600;margin-bottom:4px">${p.en}</div>
+      <div style="font-size:13px;color:#94a3b8">${p.ja}</div>
+    </div>`;
+  });
+  showPage('lesson');
+}
+
+function startPractice() {
+  phraseIdx = 0; scores = [];
+  loadPhrase();
+  showPage('practice');
+}
+
+function loadPhrase() {
+  const l = LESSONS.find(x => x.id === currentLesson);
+  const p = l.phrases[phraseIdx];
+  document.getElementById('p-en').textContent = p.en;
+  document.getElementById('p-ja').textContent = p.ja;
+  document.getElementById('p-fill').style.width = (phraseIdx / l.phrases.length * 100) + '%';
+  document.getElementById('p-text').textContent = (phraseIdx+1) + '/' + l.phrases.length;
+  document.getElementById('btn-next').textContent = (phraseIdx+1 >= l.phrases.length) ? '🏆 結果を見る' : '次へ →';
+  document.getElementById('transcript-box').classList.add('hidden');
+  document.getElementById('feedback-card').classList.add('hidden');
+  document.getElementById('loading-box').classList.add('hidden');
+  document.getElementById('hint-box').classList.add('hidden');
+  document.getElementById('hint-btn').textContent = '💡 発音ヒントを見る';
+  showHint = false; correctionText = '';
+  setMicUI('idle');
+}
+
+function toggleHint() {
+  showHint = !showHint;
+  const l = LESSONS.find(x => x.id === currentLesson);
+  const p = l.phrases[phraseIdx];
+  const box = document.getElementById('hint-box');
+  if (showHint) {
+    box.innerHTML = p.en.split(' ').map(w=>`<span style="margin-right:12px"><b style="color:#e2e8f0">${w}</b></span>`).join('') +
+      '<br><span style="color:#64748b;font-size:12px">単語を区切ってゆっくり発音しよう</span>';
+    box.classList.remove('hidden');
+    document.getElementById('hint-btn').textContent = '💡 ヒントを隠す';
+  } else {
+    box.classList.add('hidden');
+    document.getElementById('hint-btn').textContent = '💡 発音ヒントを見る';
+  }
+}
+
+function retryPhrase() {
+  document.getElementById('transcript-box').classList.add('hidden');
+  document.getElementById('feedback-card').classList.add('hidden');
+  document.getElementById('loading-box').classList.add('hidden');
+  setMicUI('idle');
+}
+
+function nextPhrase() {
+  const l = LESSONS.find(x => x.id === currentLesson);
+  if (phraseIdx + 1 >= l.phrases.length) { showResult(); }
+  else { phraseIdx++; loadPhrase(); }
+}
+
+function showResult() {
+  const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b.score,0)/scores.length) : 0;
+  document.getElementById('r-emoji').textContent = avg>=80?'🏆':avg>=60?'🌟':'💪';
+  document.getElementById('r-avg').textContent = avg;
+  const box = document.getElementById('r-scores');
+  box.innerHTML = '';
+  scores.forEach(s => {
+    const c = s.score>=80?'#34d399':s.score>=60?'#fbbf24':'#f87171';
+    box.innerHTML += `<div class="score-item"><span>${s.en}</span><span style="color:${c};font-weight:700">${s.score}点</span></div>`;
+  });
+  showPage('result');
+}
+
+// ══════════════════════════════
+// AI EVALUATE
+// ══════════════════════════════
+async function evaluate(spokenText) {
+  const l = LESSONS.find(x => x.id === currentLesson);
+  const phrase = l.phrases[phraseIdx];
+  document.getElementById('loading-box').classList.remove('hidden');
+  document.getElementById('feedback-card').classList.add('hidden');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content:
+          `You are a friendly English coach for Japanese beginners.
+Target: "${phrase.en}"
+Student said: "${spokenText}"
+Reply ONLY with valid JSON (no markdown, no backticks):
+{"score":0-100,"feedback_ja":"日本語で励ましのコメント1文","tip_ja":"発音のコツ1文","correction":"間違いがあれば正しい文、問題なければnull"}`
+        }]
+      })
+    });
+    const data = await res.json();
+    const raw = (data.content||[]).map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const fb = JSON.parse(raw);
+    scores.push({ en: phrase.en, score: fb.score });
+    renderFeedback(fb);
+  } catch(e) {
+    renderFeedback({ score:50, feedback_ja:'評価できませんでした。もう一度試してください。', tip_ja:'', correction:null });
+  }
+  document.getElementById('loading-box').classList.add('hidden');
+  setMicUI('idle');
+}
+
+function renderFeedback(fb) {
+  const badge = document.getElementById('score-badge');
+  badge.textContent = fb.score + '点';
+  badge.className = 'score-badge ' + (fb.score>=80?'score-good':fb.score>=60?'score-ok':'score-bad');
+  document.getElementById('score-label').textContent = fb.score>=80?'🎉 素晴らしい！':fb.score>=60?'👍 いい感じ！':'💪 もう一度！';
+  document.getElementById('feedback-msg').textContent = fb.feedback_ja;
+  const corrBox = document.getElementById('correction-box');
+  if (fb.correction) {
+    correctionText = fb.correction;
+    document.getElementById('correction-text').textContent = fb.correction;
+    corrBox.classList.remove('hidden');
+  } else { corrBox.classList.add('hidden'); }
+  const tipBox = document.getElementById('tip-box');
+  if (fb.tip_ja) { tipBox.textContent = '💡 ' + fb.tip_ja; tipBox.classList.remove('hidden'); }
+  else { tipBox.classList.add('hidden'); }
+  document.getElementById('feedback-card').classList.remove('hidden');
+}
+
+// ══════════════════════════════
+// CHAT
+// ══════════════════════════════
+function openChat() {
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('suggestions').style.display = 'block';
+  document.getElementById('chat-input').value = '';
+  showPage('chat');
+}
+
+function sendChatInput() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  sendChat(text);
+}
+
+async function sendChat(text) {
+  if (chatLoading || !text.trim()) return;
+  document.getElementById('suggestions').style.display = 'none';
+  appendBubble('user', text);
+  chatLoading = true;
+  const typingDiv = appendBubble('ai', '・・・');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content:
+          `You are a patient English partner for Japanese beginners. Keep reply to 1-2 short sentences. Add Japanese translation in parentheses. End with a simple question. Student said: "${text}"`
+        }]
+      })
+    });
+    const data = await res.json();
+    const reply = (data.content||[]).map(c=>c.text||'').join('');
+    typingDiv.remove();
+    appendBubble('ai', reply, true);
+    speak(reply.split('(')[0].trim(), 0.85);
+  } catch {
+    typingDiv.remove();
+    appendBubble('ai', 'Sorry, please try again!');
+  }
+  chatLoading = false;
+}
+
+function appendBubble(role, text, withListen) {
+  const msgBox = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'bubble ' + (role==='user' ? 'user' : 'ai');
+  div.textContent = text;
+  if (withListen) {
+    const btn = document.createElement('button');
+    btn.className = 'bubble-listen';
+    btn.textContent = '🔊 聞く';
+    const t = text.split('(')[0].trim();
+    btn.onclick = () => speak(t, 0.85);
+    div.appendChild(btn);
+  }
+  msgBox.appendChild(div);
+  div.scrollIntoView({ behavior: 'smooth' });
+  return div;
+}
+
+async function toggleChatMic() {
+  const btn = document.getElementById('chat-mic-btn');
+  if (isChatRec) {
+    if (recognition) recognition.stop();
+    isChatRec = false;
+    btn.classList.remove('active'); btn.textContent = '🎙️';
+    return;
+  }
+  // request mic permission first
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch {
+    alert('マイクへのアクセスが拒否されました。ブラウザの設定を確認してください。');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('音声認識はChromeブラウザのみ対応しています。'); return; }
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.onresult = e => {
+    const text = e.results[0][0].transcript;
+    isChatRec = false; btn.classList.remove('active'); btn.textContent = '🎙️';
+    if (micStream) { micStream.getTracks().forEach(t=>t.stop()); micStream=null; }
+    sendChat(text);
+  };
+  recognition.onerror = () => { isChatRec=false; btn.classList.remove('active'); btn.textContent='🎙️'; };
+  recognition.onend   = () => { isChatRec=false; btn.classList.remove('active'); btn.textContent='🎙️'; };
+  recognition.start();
+  isChatRec = true; btn.classList.add('active'); btn.textContent = '⏹️';
+}
+</script>
+</body>
+</html>
